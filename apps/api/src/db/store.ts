@@ -11,6 +11,7 @@ import {
   SincronizacaoLog,
   MetaCliente,
   RelatorioGerado,
+  AgendamentoRelatorio,
 } from '@dashboard/shared';
 
 export interface DataStore {
@@ -26,6 +27,7 @@ export interface DataStore {
   sincronizacoes: SincronizacaoLog[];
   metas: MetaCliente[];
   relatorios: RelatorioGerado[];
+  agendamentos: AgendamentoRelatorio[];
 }
 
 export function inicializarStore(): DataStore {
@@ -487,6 +489,23 @@ export function inicializarStore(): DataStore {
     },
   ];
 
+  const agendamentos: AgendamentoRelatorio[] = [
+    {
+      id: 'agd-01',
+      clienteId: 'cli-01',
+      titulo: 'Envio Mensal de Fechamento de Metas',
+      frequencia: 'mensal',
+      diaEnvio: 1, // Todo dia 1º
+      horaEnvio: '08:00',
+      destinatariosEmail: ['carlos@technova.com.br', 'diretoria@technova.com.br'],
+      webhookWhatsapp: 'https://api.whatsapp-service.com/webhook/send-group',
+      formato: 'pdf',
+      ativo: true,
+      ultimoEnvio: '2026-10-01T08:00:00Z',
+      statusUltimoEnvio: 'sucesso',
+    },
+  ];
+
   return {
     marca,
     clientes,
@@ -500,6 +519,7 @@ export function inicializarStore(): DataStore {
     sincronizacoes,
     metas,
     relatorios,
+    agendamentos,
   };
 }
 

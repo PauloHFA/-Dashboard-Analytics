@@ -20,6 +20,8 @@ import {
 import { KpiCard } from '../components/KpiCard';
 import { TrendChart } from '../components/charts/TrendChart';
 import { ChannelDonutChart } from '../components/charts/ChannelDonutChart';
+import { AiExecutiveSummaryCard } from '../components/AiExecutiveSummaryCard';
+import { useFilters } from '../context/FilterContext';
 
 interface Props {
   resumoAtual: ResumoMetricas;
@@ -38,12 +40,21 @@ export const OverviewView: React.FC<Props> = ({
   serieComparativa,
   canais,
 }) => {
+  const { clienteId, inicio, fim, canais: canaisSelecionados } = useFilters();
   const [metricaGrafico, setMetricaGrafico] = useState<'investimento' | 'conversoes' | 'receita' | 'cliques'>(
     'investimento'
   );
 
   return (
     <div className="space-y-6">
+      {/* 1. AI Growth Copilot - Parecer Executivo Automatizado */}
+      <AiExecutiveSummaryCard
+        clienteId={clienteId}
+        inicio={inicio}
+        fim={fim}
+        canais={canaisSelecionados}
+      />
+
       {/* Grid de KPIs Principais (RF-03 e Seção 13 do PDF) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiCard

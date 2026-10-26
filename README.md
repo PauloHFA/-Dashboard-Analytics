@@ -81,4 +81,15 @@ npm run dev:web
 | **RF-14 Marca da Agência** | ✅ Implementado | Personalização configurável pela agência de logo, cores (primária, secundária) e rodapé do relatório. |
 | **RF-16 Metas e Alertas Inteligentes** | ✅ Implementado | Monitoramento de teto de CPA, piso de CTR, meta de ROAS e alertas de conectividade com badges visuais. |
 | **RF-17 Exportação de Dados em CSV** | ✅ Implementado | Endpoint direto e central de relatórios com geração de arquivo CSV com BOM UTF-8 compatível com Excel no Brasil. |
+| **Plus 1: AI Growth Copilot** | 🚀 Inovação | Diagnóstico executivo automático por IA com score de saúde, anomalias e recomendações estratégicas. |
+| **Plus 2: Agendamento & Disparo (RF-15)** | 🚀 Inovação | Rotinas programadas recorrentes com envio automático por e-mail e webhook de WhatsApp. |
+| **Plus 3: Budget Pacing & Run-rate** | 🚀 Inovação | Projeção financeira do fechamento do mês e controle diário para evitar estouro de verba de mídia. |
+| **Plus 4: Webhook Nativo de CRM** | 🚀 Inovação | Endpoint para recepção em tempo real de vendas de RD Station, HubSpot ou PipeRun. |
+| **Plus 5: Dark Mode & Modo Reunião (RNF-07)** | 🚀 Inovação | Alternância de tema claro/escuro e modo apresentação em tela cheia para TVs e projetores. |
+
+---
+
+## 📚 Documentações Técnicas e de Operação
+* [**Manual de Operação e Diretrizes de Manutenção**](docs/MANUAL_E_DIRETRIZES.md): Fórmulas de métricas, adição de novos conectores (TikTok/LinkedIn) e runbook de incidentes.
+* [**Extensões e Inovações Além do Escopo Base**](docs/EXTENSOES_E_MELHORIAS.md): Detalhamento técnico aprofundado dos 5 módulos de valor agregado implementados.
 

@@ -3,13 +3,16 @@ import { useFilters } from '../context/FilterContext';
 import { useAuth } from '../context/AuthContext';
 import { fetchApi } from '../services/api';
 import { EntradaManual, formatarMoeda, formatarNumero } from '@dashboard/shared';
-import { PlusCircle, HelpCircle, CheckCircle2 } from 'lucide-react';
+import { PlusCircle, HelpCircle, CheckCircle2, Webhook, Copy, Check, Zap } from 'lucide-react';
 
 export const ManualEntriesView: React.FC = () => {
   const { clienteId, clienteAtual } = useFilters();
   const { usuario } = useAuth();
   const [entradas, setEntradas] = useState<EntradaManual[]>([]);
   const [sucesso, setSucesso] = useState(false);
+  const [copiadoWebhook, setCopiadoWebhook] = useState(false);
+  const [simulandoWebhook, setSimulandoWebhook] = useState(false);
+  const [mensagemWebhook, setMensagemWebhook] = useState<string | null>(null);
 
   // Form state
   const [data, setData] = useState(new Date().toISOString().slice(0, 10));
@@ -52,6 +55,34 @@ export const ManualEntriesView: React.FC = () => {
       alert(err.message);
     }
   };
+
+  const handleSimularWebhook = async () => {
+    try {
+      setSimulandoWebhook(true);
+      const valor = Math.floor(Math.random() * 2000) + 1500;
+      const res = await fetch(`/api/v1/webhooks/crm/${clienteId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          evento: 'oportunidade_ganha_crm',
+          receita: valor,
+          novosClientes: 1,
+          custosExtras: 0,
+          contato: { nome: `Lead CRM #${Math.floor(Math.random() * 900) + 100}`, email: 'lead@exemplo.com' },
+        }),
+      });
+      await res.json();
+      setMensagemWebhook(`Sucesso! Venda de R$ ${valor},00 recebida via Webhook e somada ao CAC/ROI.`);
+      setTimeout(() => setMensagemWebhook(null), 4000);
+      carregarEntradas();
+    } catch (err: any) {
+      alert(err.message || 'Falha no webhook');
+    } finally {
+      setSimulandoWebhook(false);
+    }
+  };
+
+  const webhookUrl = `${window.location.origin}/api/v1/webhooks/crm/${clienteId}`;
 
   return (
     <div className="space-y-6">
@@ -198,6 +229,67 @@ export const ManualEntriesView: React.FC = () => {
               </tbody>
             </table>
           </div>
+        </div>
+      </div>
+
+      {/* Integração Nativa via Webhook de CRM (RD Station, HubSpot, PipeRun) */}
+      <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <Webhook className="w-4 h-4" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-bold text-slate-900">Integração Direta com CRM & E-commerce (Webhook)</h3>
+                <span className="text-[10px] font-mono uppercase bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold">
+                  Automação em Tempo Real
+                </span>
+              </div>
+              <p className="text-xs text-slate-500">
+                Receba vendas ganhas do RD Station, HubSpot ou PipeRun e atualize o CAC/ROI sem esforço manual
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={handleSimularWebhook}
+            disabled={simulandoWebhook}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow transition disabled:opacity-50"
+          >
+            <Zap className={`w-3.5 h-3.5 ${simulandoWebhook ? 'animate-bounce' : ''}`} />
+            <span>{simulandoWebhook ? 'Enviando payload...' : 'Simular Venda do CRM'}</span>
+          </button>
+        </div>
+
+        {mensagemWebhook && (
+          <div className="mb-4 flex items-center gap-2 text-xs text-emerald-900 bg-emerald-50 border border-emerald-200 p-3 rounded-lg">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span>{mensagemWebhook}</span>
+          </div>
+        )}
+
+        <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-200 space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-semibold text-slate-700">Endpoint Webhook do Cliente:</span>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(webhookUrl);
+                setCopiadoWebhook(true);
+                setTimeout(() => setCopiadoWebhook(false), 2000);
+              }}
+              className="flex items-center gap-1 text-blue-600 hover:text-blue-800 font-medium"
+            >
+              {copiadoWebhook ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+              <span>{copiadoWebhook ? 'Copiado!' : 'Copiar URL'}</span>
+            </button>
+          </div>
+          <p className="font-mono text-xs bg-white border border-slate-200 rounded p-2 text-slate-800 break-all select-all">
+            {webhookUrl}
+          </p>
+          <p className="text-[11px] text-slate-400">
+            Configure este endpoint no seu CRM para disparar eventos de <strong>Oportunidade Ganha / Venda Fechada</strong>.
+          </p>
         </div>
       </div>
     </div>

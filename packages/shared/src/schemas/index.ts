@@ -66,3 +66,14 @@ export const CriarRelatorioSchema = z.object({
   comparar: z.enum(['nenhum', 'anterior', 'ano_anterior']).default('anterior'),
 });
 
+export const AgendamentoRelatorioSchema = z.object({
+  titulo: z.string().min(3),
+  frequencia: z.enum(['semanal', 'quinzenal', 'mensal']),
+  diaEnvio: z.number().int().min(1).max(31),
+  horaEnvio: z.string().default('08:00'),
+  destinatariosEmail: z.array(z.string().email()),
+  webhookWhatsapp: z.string().url().optional().or(z.literal('')),
+  formato: z.enum(['pdf', 'csv', 'ambos']).default('pdf'),
+  ativo: z.boolean().default(true),
+});
+

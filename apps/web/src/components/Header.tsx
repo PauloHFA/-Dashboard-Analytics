@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { RefreshCw, Printer, User, FileSpreadsheet } from 'lucide-react';
+import { RefreshCw, Printer, User, FileSpreadsheet, Moon, Sun, Maximize2, Minimize2 } from 'lucide-react';
 
 interface HeaderProps {
   onExportPdf: () => void;
@@ -16,6 +16,26 @@ export const Header: React.FC<HeaderProps> = ({
   minutosDesdeAtualizacao,
 }) => {
   const { usuario, usuariosDisponiveis, loginComo } = useAuth();
+  const [isDark, setIsDark] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDark]);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen().catch(() => {});
+      setIsFullscreen(false);
+    }
+  };
 
   return (
     <header className="bg-white border-b border-slate-200 sticky top-0 z-30 no-print">
@@ -52,7 +72,25 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* User Info & Switcher & Actions */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Alternador Dark Mode */}
+          <button
+            onClick={() => setIsDark(!isDark)}
+            title={isDark ? 'Ativar Modo Claro' : 'Ativar Modo Escuro'}
+            className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition"
+          >
+            {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-600" />}
+          </button>
+
+          {/* Modo Apresentação / Tela Cheia (RNF-07) */}
+          <button
+            onClick={toggleFullscreen}
+            title={isFullscreen ? 'Sair da Tela Cheia' : 'Modo Reunião / Tela Cheia (RNF-07)'}
+            className="hidden md:flex p-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition"
+          >
+            {isFullscreen ? <Minimize2 className="w-4 h-4 text-blue-600" /> : <Maximize2 className="w-4 h-4 text-slate-600" />}
+          </button>
+
           <button
             onClick={onExportCsv}
             title="Exportar planilha de dados em CSV (RF-17)"

@@ -257,3 +257,19 @@ export interface RelatorioGerado {
   concluidoEm?: string;
 }
 
+// Agendamento de Relatórios e Envio Automático (RF-15 do PDF)
+export interface AgendamentoRelatorio {
+  id: string;
+  clienteId: string;
+  titulo: string;
+  frequencia: 'semanal' | 'quinzenal' | 'mensal';
+  diaEnvio: number; // 1-7 para semanal, 1-31 para mensal
+  horaEnvio: string; // Ex: "08:00"
+  destinatariosEmail: string[];
+  webhookWhatsapp?: string;
+  formato: 'pdf' | 'csv' | 'ambos';
+  ativo: boolean;
+  ultimoEnvio?: string;
+  statusUltimoEnvio?: 'sucesso' | 'erro';
+}
+

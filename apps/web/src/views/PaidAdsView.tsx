@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { ResumoCampanha, formatarMoeda, formatarNumero, formatarPercentual } from '@dashboard/shared';
 import { Search } from 'lucide-react';
+import { BudgetPacingCard } from '../components/BudgetPacingCard';
+import { useFilters } from '../context/FilterContext';
 
 interface Props {
   campanhas: ResumoCampanha[];
 }
 
 export const PaidAdsView: React.FC<Props> = ({ campanhas }) => {
+  const { clienteId } = useFilters();
   const [busca, setBusca] = useState('');
   const [filtroCanal, setFiltroCanal] = useState<'todos' | 'google_ads' | 'meta_ads'>('todos');
 
@@ -18,6 +21,9 @@ export const PaidAdsView: React.FC<Props> = ({ campanhas }) => {
 
   return (
     <div className="space-y-6">
+      {/* 1. Previsão de Ritmo de Gasto (Budget Pacing & Run-rate) */}
+      <BudgetPacingCard clienteId={clienteId} />
+
       <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>

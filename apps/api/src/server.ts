@@ -7,7 +7,9 @@ import {
   AgenciaMarcaSchema,
   MetaClienteSchema,
   CriarRelatorioSchema,
+  AgendamentoRelatorioSchema,
   RelatorioGerado,
+  AgendamentoRelatorio,
 } from '@dashboard/shared';
 import { store } from './db/store';
 import { authMiddleware, isolamentoClienteMiddleware } from './middleware/auth';
@@ -20,6 +22,8 @@ import {
 import { obterConector } from './connectors';
 import { avaliarAlertasCliente } from './services/alertService';
 import { gerarCsvMetricas } from './services/csvExportService';
+import { gerarParecerIa } from './services/aiCopilotService';
+import { calcularBudgetPacing } from './services/pacingService';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -307,6 +311,52 @@ app.post('/api/v1/clientes/:id/entradas', authMiddleware, (req, res) => {
   res.status(201).json({ entrada: novaEntrada });
 });
 
+// Webhook Nativo de CRM / E-commerce (RD Station, HubSpot, PipeRun - RF-12 / Seção 4.2)
+app.post('/api/v1/webhooks/crm/:clienteId', (req, res) => {
+  const clienteId = req.params.clienteId;
+  const cliente = store.clientes.find((c) => c.id === clienteId);
+
+  if (!cliente) {
+    return res.status(404).json({ status: 404, detail: 'Cliente não encontrado para este webhook.' });
+  }
+
+  const { receita, novosClientes, custosExtras, evento, contato, observacao } = req.body;
+  const dataHoje = new Date().toISOString().slice(0, 10);
+
+  const valorReceita = Number(receita) || 0;
+  const qtdNovosClientes = Number(novosClientes) !== undefined ? Number(novosClientes) : 1;
+  const valorCustos = Number(custosExtras) || 0;
+
+  // Encontra ou cria entrada manual para hoje
+  let entradaHoje = store.entradasManuais.find((e) => e.clienteId === clienteId && e.data === dataHoje);
+
+  if (entradaHoje) {
+    entradaHoje.receita += valorReceita;
+    entradaHoje.novosClientes += qtdNovosClientes;
+    entradaHoje.custosExtras += valorCustos;
+    if (contato?.nome) {
+      entradaHoje.observacao = `${entradaHoje.observacao || ''}; Venda: ${contato.nome}`;
+    }
+  } else {
+    entradaHoje = {
+      id: `em-webhook-${Date.now()}`,
+      clienteId,
+      data: dataHoje,
+      receita: valorReceita,
+      novosClientes: qtdNovosClientes,
+      custosExtras: valorCustos,
+      observacao: observacao || `Webhook ${evento || 'CRM'}: ${contato?.nome || 'Novo Cliente Integrado'}`,
+    };
+    store.entradasManuais.push(entradaHoje);
+  }
+
+  res.status(200).json({
+    sucesso: true,
+    mensagem: 'Evento de conversão/venda registrado via Webhook com sucesso no banco de dados.',
+    dadosAtualizados: entradaHoje,
+  });
+});
+
 // Exportação em CSV (RF-17 do PDF)
 app.get('/api/v1/metricas/exportar-csv', authMiddleware, isolamentoClienteMiddleware, (req, res) => {
   const clienteId = req.clienteIdPermitido!;
@@ -475,6 +525,103 @@ app.get('/api/v1/relatorios/:id/download', authMiddleware, (req, res) => {
     relatorio,
     downloadUrl: relatorio.arquivoUrl,
   });
+});
+
+// Agendamentos de Relatórios Automáticos (RF-15 do PDF)
+app.get('/api/v1/clientes/:id/agendamentos', authMiddleware, (req, res) => {
+  const clienteId = req.params.id;
+  const usuario = req.usuario!;
+
+  if (usuario.perfil !== 'admin' && !usuario.clientesIds.includes(clienteId)) {
+    return res.status(403).json({ status: 403, detail: 'Acesso negado.' });
+  }
+
+  const agendamentos = store.agendamentos.filter((a) => a.clienteId === clienteId);
+  res.json({ agendamentos });
+});
+
+app.post('/api/v1/clientes/:id/agendamentos', authMiddleware, (req, res) => {
+  const clienteId = req.params.id;
+  const usuario = req.usuario!;
+
+  if (usuario.perfil === 'cliente') {
+    return res.status(403).json({ status: 403, detail: 'Apenas membros da agência podem configurar agendamentos.' });
+  }
+
+  const parsed = AgendamentoRelatorioSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(422).json({ status: 422, errors: parsed.error.errors });
+  }
+
+  const novoAgendamento: AgendamentoRelatorio = {
+    id: `agd-${Date.now()}`,
+    clienteId,
+    ...parsed.data,
+    webhookWhatsapp: parsed.data.webhookWhatsapp || undefined,
+  };
+
+  store.agendamentos.push(novoAgendamento);
+  res.status(201).json({ agendamento: novoAgendamento });
+});
+
+app.delete('/api/v1/agendamentos/:id', authMiddleware, (req, res) => {
+  const idx = store.agendamentos.findIndex((a) => a.id === req.params.id);
+  if (idx === -1) {
+    return res.status(404).json({ status: 404, detail: 'Agendamento não encontrado.' });
+  }
+
+  const usuario = req.usuario!;
+  const agendamento = store.agendamentos[idx];
+  if (usuario.perfil !== 'admin' && !usuario.clientesIds.includes(agendamento.clienteId)) {
+    return res.status(403).json({ status: 403, detail: 'Acesso negado.' });
+  }
+
+  store.agendamentos.splice(idx, 1);
+  res.json({ mensagem: 'Agendamento removido com sucesso.' });
+});
+
+app.post('/api/v1/agendamentos/:id/testar', authMiddleware, (req, res) => {
+  const agendamento = store.agendamentos.find((a) => a.id === req.params.id);
+  if (!agendamento) {
+    return res.status(404).json({ status: 404, detail: 'Agendamento não encontrado.' });
+  }
+
+  agendamento.ultimoEnvio = new Date().toISOString();
+  agendamento.statusUltimoEnvio = 'sucesso';
+
+  res.json({
+    mensagem: `Disparo de teste simulado com sucesso! E-mails enviados para: ${agendamento.destinatariosEmail.join(', ')}` +
+      (agendamento.webhookWhatsapp ? ` e payload despachado para WhatsApp via Webhook.` : ''),
+    agendamento,
+  });
+});
+
+// Budget Pacing & Previsão de Run-rate
+app.get('/api/v1/clientes/:id/pacing', authMiddleware, (req, res) => {
+  const clienteId = req.params.id;
+  const usuario = req.usuario!;
+
+  if (usuario.perfil !== 'admin' && !usuario.clientesIds.includes(clienteId)) {
+    return res.status(403).json({ status: 403, detail: 'Acesso negado.' });
+  }
+
+  const pacing = calcularBudgetPacing(clienteId);
+  res.json({ pacing });
+});
+
+// IA Growth Copilot - Parecer Executivo de Desempenho
+app.post('/api/v1/ia/parecer', authMiddleware, isolamentoClienteMiddleware, (req, res) => {
+  const clienteId = req.clienteIdPermitido!;
+  const inicio = (req.body.inicio as string) || (req.query.inicio as string);
+  const fim = (req.body.fim as string) || (req.query.fim as string);
+  const canais = req.body.canais as string[] | undefined;
+
+  if (!inicio || !fim) {
+    return res.status(422).json({ status: 422, detail: 'Parâmetros inicio e fim são obrigatórios.' });
+  }
+
+  const parecer = gerarParecerIa(clienteId, inicio, fim, canais);
+  res.json({ parecer });
 });
 
 // Marca da Agência (RF-14)
