@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Sparkles, CheckCircle2, AlertTriangle, Lightbulb, Copy, Check, RefreshCw } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Sparkles, CheckCircle2, AlertTriangle, Lightbulb, Copy, Check, RefreshCw, Activity, ArrowUpRight } from 'lucide-react';
 import { fetchApi } from '../services/api';
 
 interface ParecerData {
@@ -24,9 +24,9 @@ export const AiExecutiveSummaryCard: React.FC<Props> = ({ clienteId, inicio, fim
   const [gerando, setGerando] = useState(false);
   const [copiado, setCopiado] = useState(false);
 
-  const handleGerarParecer = async () => {
+  const carregarParecer = async (silencioso = false) => {
     try {
-      setGerando(true);
+      if (!silencioso) setGerando(true);
       const res = await fetchApi<{ parecer: ParecerData }>('/ia/parecer', {
         method: 'POST',
         body: JSON.stringify({
@@ -38,11 +38,18 @@ export const AiExecutiveSummaryCard: React.FC<Props> = ({ clienteId, inicio, fim
       });
       setParecer(res.parecer);
     } catch (err: any) {
-      alert(err.message || 'Erro ao gerar parecer com IA.');
+      if (!silencioso) {
+        alert(err.message || 'Erro ao gerar parecer com IA.');
+      }
     } finally {
       setGerando(false);
     }
   };
+
+  // Carrega automaticamente o parecer na montagem e ao trocar cliente/datas
+  useEffect(() => {
+    carregarParecer(true);
+  }, [clienteId, inicio, fim, canais.join(',')]);
 
   const handleCopiarTexto = () => {
     if (!parecer) return;
@@ -71,23 +78,21 @@ _Emitido automaticamente pelo AI Growth Copilot - Agência GrowMetrics Digital_`
   };
 
   return (
-    <div className="bg-linear-to-r from-blue-900 via-indigo-900 to-slate-900 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
-      {/* Detalhe de fundo */}
-      <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-blue-500/10 rounded-full blur-2xl pointer-events-none"></div>
-
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-        <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-300">
+    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-indigo-100 dark:border-slate-800 p-6 shadow-sm hover:shadow-md transition-all">
+      {/* Cabeçalho do Card */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-sm shadow-indigo-200 dark:shadow-none">
             <Sparkles className="w-5 h-5 text-amber-300 animate-pulse" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-base font-bold text-white tracking-tight">AI Growth Copilot</h3>
-              <span className="text-[10px] uppercase font-mono font-bold px-2 py-0.5 rounded bg-amber-400/20 text-amber-300 border border-amber-400/30">
-                IA Preditiva
+              <h3 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">AI Growth Copilot</h3>
+              <span className="text-[10px] uppercase font-mono font-bold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                IA Preditiva & Diagnóstico
               </span>
             </div>
-            <p className="text-xs text-blue-200/80">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               Diagnóstico executivo automatizado e recomendações estratégicas para a agência
             </p>
           </div>
@@ -97,17 +102,17 @@ _Emitido automaticamente pelo AI Growth Copilot - Agência GrowMetrics Digital_`
           {parecer && (
             <button
               onClick={handleCopiarTexto}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-semibold text-white transition border border-white/10"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-xs font-semibold text-emerald-800 dark:text-emerald-300 transition border border-emerald-200 dark:border-emerald-800 cursor-pointer"
             >
-              {copiado ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+              {copiado ? <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
               <span>{copiado ? 'Copiado para WhatsApp!' : 'Copiar Parecer'}</span>
             </button>
           )}
 
           <button
-            onClick={handleGerarParecer}
+            onClick={() => carregarParecer(false)}
             disabled={gerando}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 active:scale-95 text-xs font-semibold text-white transition shadow-sm disabled:opacity-50"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 active:scale-95 text-xs font-semibold text-white transition shadow-sm disabled:opacity-50 cursor-pointer"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${gerando ? 'animate-spin' : ''}`} />
             <span>{gerando ? 'Analisando métricas...' : parecer ? 'Regerar Análise' : 'Gerar Parecer por IA'}</span>
@@ -115,30 +120,57 @@ _Emitido automaticamente pelo AI Growth Copilot - Agência GrowMetrics Digital_`
         </div>
       </div>
 
-      {/* Conteúdo Gerado pela IA */}
+      {/* Conteúdo Analítico */}
       {parecer ? (
-        <div className="space-y-4 pt-2 border-t border-white/10 mt-3 animate-fade-in">
-          {/* Resumo e Score */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-xl bg-white/5 border border-white/10">
-            <p className="text-xs text-slate-200 leading-relaxed max-w-3xl">{parecer.resumoExecutivo}</p>
-            <div className="shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-500/20 border border-blue-400/20 self-start md:self-center">
-              <span className="text-[11px] text-blue-200 uppercase font-semibold">Índice Geral:</span>
-              <span className="text-lg font-black text-amber-300">{parecer.scoreDesempenho}/100</span>
+        <div className="space-y-4 pt-1">
+          {/* Caixa de Resumo Narrativo e Score */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700/80">
+            <div className="space-y-1">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                <Activity className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                Resumo Executivo do Período
+              </span>
+              <p className="text-xs sm:text-sm text-slate-800 dark:text-slate-200 leading-relaxed font-normal">
+                {parecer.resumoExecutivo}
+              </p>
+            </div>
+
+            <div className="shrink-0 flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xs self-start md:self-center">
+              <div>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold tracking-wider block">
+                  Índice de Saúde
+                </span>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-2xl font-black text-blue-600 dark:text-blue-400">{parecer.scoreDesempenho}</span>
+                  <span className="text-xs font-semibold text-slate-400">/100</span>
+                </div>
+              </div>
+              <span
+                className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
+                  parecer.scoreDesempenho >= 75
+                    ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                    : parecer.scoreDesempenho >= 50
+                    ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
+                    : 'bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-800'
+                }`}
+              >
+                {parecer.scoreDesempenho >= 75 ? 'Excelente' : parecer.scoreDesempenho >= 50 ? 'Estável' : 'Crítico'}
+              </span>
             </div>
           </div>
 
-          {/* Grid de Destaques, Pontos de Atenção e Recomendações */}
+          {/* Grid de 3 Pilares: Destaques, Atenção e Recomendações */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Destaques Positivos */}
-            <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-              <div className="flex items-center gap-1.5 mb-2 text-emerald-400 font-bold text-xs uppercase">
-                <CheckCircle2 className="w-4 h-4" />
+            <div className="p-4 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/25 border border-emerald-200 dark:border-emerald-800/60">
+              <div className="flex items-center gap-1.5 mb-2.5 text-emerald-800 dark:text-emerald-300 font-bold text-xs uppercase tracking-wider">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 <span>Destaques Positivos</span>
               </div>
-              <ul className="space-y-1.5 text-xs text-emerald-100/90 leading-tight">
+              <ul className="space-y-2 text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
                 {parecer.destaquesPositivos.map((d, i) => (
                   <li key={i} className="flex items-start gap-1.5">
-                    <span className="text-emerald-400 shrink-0">•</span>
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold shrink-0">•</span>
                     <span>{d}</span>
                   </li>
                 ))}
@@ -146,15 +178,15 @@ _Emitido automaticamente pelo AI Growth Copilot - Agência GrowMetrics Digital_`
             </div>
 
             {/* Pontos de Atenção */}
-            <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20">
-              <div className="flex items-center gap-1.5 mb-2 text-amber-400 font-bold text-xs uppercase">
-                <AlertTriangle className="w-4 h-4" />
+            <div className="p-4 rounded-xl bg-amber-50/80 dark:bg-amber-950/25 border border-amber-200 dark:border-amber-800/60">
+              <div className="flex items-center gap-1.5 mb-2.5 text-amber-800 dark:text-amber-300 font-bold text-xs uppercase tracking-wider">
+                <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                 <span>Pontos de Atenção</span>
               </div>
-              <ul className="space-y-1.5 text-xs text-amber-100/90 leading-tight">
+              <ul className="space-y-2 text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
                 {parecer.pontosDeAtencao.map((p, i) => (
                   <li key={i} className="flex items-start gap-1.5">
-                    <span className="text-amber-400 shrink-0">•</span>
+                    <span className="text-amber-600 dark:text-amber-400 font-bold shrink-0">•</span>
                     <span>{p}</span>
                   </li>
                 ))}
@@ -162,15 +194,15 @@ _Emitido automaticamente pelo AI Growth Copilot - Agência GrowMetrics Digital_`
             </div>
 
             {/* Recomendações Estratégicas */}
-            <div className="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/20">
-              <div className="flex items-center gap-1.5 mb-2 text-blue-300 font-bold text-xs uppercase">
-                <Lightbulb className="w-4 h-4 text-amber-300" />
+            <div className="p-4 rounded-xl bg-blue-50/80 dark:bg-blue-950/25 border border-blue-200 dark:border-blue-800/60">
+              <div className="flex items-center gap-1.5 mb-2.5 text-blue-800 dark:text-blue-300 font-bold text-xs uppercase tracking-wider">
+                <Lightbulb className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                 <span>Próximas Ações</span>
               </div>
-              <ul className="space-y-1.5 text-xs text-blue-100/90 leading-tight">
+              <ul className="space-y-2 text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
                 {parecer.recomendacoesEstrategicas.map((r, i) => (
                   <li key={i} className="flex items-start gap-1.5">
-                    <span className="text-blue-400 shrink-0">•</span>
+                    <ArrowUpRight className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
                     <span>{r}</span>
                   </li>
                 ))}
@@ -179,8 +211,22 @@ _Emitido automaticamente pelo AI Growth Copilot - Agência GrowMetrics Digital_`
           </div>
         </div>
       ) : (
-        <div className="pt-2 text-xs text-blue-200/60 flex items-center gap-2">
-          <span>Clique em <strong>"Gerar Parecer por IA"</strong> para cruzar dados de mídia, CPA, ROAS e campanhas em segundos.</span>
+        <div className="p-6 text-center bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-200 dark:border-slate-700">
+          <Sparkles className="w-8 h-8 text-indigo-500 mx-auto mb-2 animate-bounce" />
+          <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            Parecer de Desempenho Inteligente
+          </p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto mb-3">
+            O Copilot cruza automaticamente investimentos, retorno sobre anúncios (ROAS), variações de CPA e saúde das campanhas.
+          </p>
+          <button
+            onClick={() => carregarParecer(false)}
+            disabled={gerando}
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition shadow cursor-pointer"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${gerando ? 'animate-spin' : ''}`} />
+            <span>{gerando ? 'Processando análise...' : 'Gerar Parecer Agora'}</span>
+          </button>
         </div>
       )}
     </div>
