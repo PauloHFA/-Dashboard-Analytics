@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  # 1. Banco de Dados PostgreSQL 16 com RLS
+  postgres:
+    image: postgres:16-alpine
+    container_name: dashboard_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-dashboard_analytics}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres_dev_secret}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/migrations:/docker-entrypoint-initdb.d/01_migrations
+      - ./database/seeds:/docker-entrypoint-initdb.d/02_seeds
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # 2. Redis 7 para Cache e Filas de Sincronização (BullMQ)
+  redis:
+    image: redis:7-alpine
+    container_name: dashboard_redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # 3. Backend API REST (Node.js + Express + TypeScript)
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: dashboard_api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DATABASE_URL: postgres://dashboard_app_user:dashboard_app_pass_secret@postgres:5432/${POSTGRES_DB:-dashboard_analytics}
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-chave_secreta_super_segura_para_assinatura_jwt}
+      ENCRYPTION_KEY_AES: ${ENCRYPTION_KEY_AES:-01234567890123456789012345678901}
+    ports:
+      - "3001:3001"
+
+  # 4. Front-end Web (React + Vite + Nginx)
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: dashboard_web
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "3000:80"
+
+volumes:
+  postgres_data:
+  redis_data:
+

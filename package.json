@@ -1,0 +1,21 @@
+{
+  "name": "dashboard-analytics-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "test": "npx tsx --test packages/shared/test/*.test.ts apps/api/test/*.test.ts",
+    "check:acceptance": "npx tsx scripts/acceptance_check.ts",
+    "dev:shared": "npm --workspace=@dashboard/shared run build",
+    "dev:api": "npm --workspace=@dashboard/api run dev",
+    "dev:web": "npm --workspace=@dashboard/web run dev",
+    "dev": "npm run dev:api",
+    "build": "npm run build --workspaces"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}

@@ -1,0 +1,41 @@
+name: CI - Integração Contínua
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  build-and-test:
+    name: Build, Validação de Tipos e Testes Automatizados
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [ 20.x, 22.x ]
+
+    steps:
+      - name: Checkout do Repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Instalar Dependências
+        run: npm ci
+
+      - name: Compilar Pacotes Compartilhados (@dashboard/shared)
+        run: npm --workspace=@dashboard/shared run build
+
+      - name: Executar Testes Automatizados (Métricas, RLS, Alertas, CSV)
+        run: npm test
+
+      - name: Validar Build de Todos os Workspaces (API + Web)
+        run: npm run build
+
+      - name: Executar Auditoria de Critérios de Aceite (Seção 14 do PDF)
+        run: npx tsx scripts/acceptance_check.ts
