@@ -151,3 +151,4 @@ executarChecklistDeAceite().catch((err) => {
   console.error('[ERRO NA AUDITORIA]:', err);
   process.exit(1);
 });
+

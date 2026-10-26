@@ -87,3 +87,4 @@ Todo commit ou Pull Request passa automaticamente pelo pipeline do GitHub Action
 1. Compilação TypeScript de todos os pacotes (`npm run build`).
 2. Execução dos **24 testes unitários e de integração** (`npm test`).
 3. Auditoria automatizada dos **Critérios de Aceite da Seção 14** (`npm run check:acceptance`).
+

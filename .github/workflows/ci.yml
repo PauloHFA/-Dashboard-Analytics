@@ -39,3 +39,4 @@ jobs:
 
       - name: Executar Auditoria de Critérios de Aceite (Seção 14 do PDF)
         run: npx tsx scripts/acceptance_check.ts
+
