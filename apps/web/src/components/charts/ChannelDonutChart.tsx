@@ -3,12 +3,14 @@ import { Doughnut } from 'react-chartjs-2';
 import './chartSetup';
 import { temaCores } from './chartSetup';
 import { MetricasPorCanal } from '@dashboard/shared';
+import { useTheme } from '../../context/ThemeContext';
 
 interface Props {
   canais: MetricasPorCanal[];
 }
 
 export const ChannelDonutChart: React.FC<Props> = ({ canais }) => {
+  const { isDark } = useTheme();
   const canaisComInvestimento = canais.filter((c) => c.investimento > 0);
 
   const data = {
@@ -20,7 +22,7 @@ export const ChannelDonutChart: React.FC<Props> = ({ canais }) => {
           c.canal === 'google_ads' ? temaCores.canais.google_ads : temaCores.canais.meta_ads
         ),
         borderWidth: 2,
-        borderColor: '#ffffff',
+        borderColor: isDark ? '#0f172a' : '#ffffff',
       },
     ],
   };
@@ -35,6 +37,7 @@ export const ChannelDonutChart: React.FC<Props> = ({ canais }) => {
           usePointStyle: true,
           boxWidth: 8,
           font: { size: 12 },
+          color: isDark ? '#cbd5e1' : '#334155',
         },
       },
       tooltip: {
@@ -57,4 +60,3 @@ export const ChannelDonutChart: React.FC<Props> = ({ canais }) => {
     </div>
   );
 };
-

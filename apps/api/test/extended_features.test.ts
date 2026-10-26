@@ -63,3 +63,4 @@ test('Recurso 4: Webhook Nativo de CRM para CAC e ROI', async (t) => {
     assert.equal(novaEntrada.receita, 4500.0);
   });
 });
+

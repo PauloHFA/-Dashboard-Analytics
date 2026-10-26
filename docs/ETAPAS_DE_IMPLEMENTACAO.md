@@ -188,3 +188,4 @@ Para rodar a checagem dos critérios de aceite da Seção 14 do PDF:
 ```bash
 npm run check:acceptance
 ```
+

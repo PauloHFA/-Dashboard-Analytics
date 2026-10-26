@@ -118,3 +118,4 @@ Atende ao Requisito Não Funcional **RNF-07** (*"Responsivo, legível em tela ch
 ## 🧪 Cobertura de Testes das Extensões
 
 Todas as novas funcionalidades foram blindadas com testes automatizados adicionais em [`apps/api/test/extended_features.test.ts`](file:///c:/Projetos/DashBoardAnalytics/apps/api/test/extended_features.test.ts), elevando o total da suíte para **32 testes automatizados verdes (`npm test`)**.
+

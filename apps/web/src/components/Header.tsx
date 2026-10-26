@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { RefreshCw, Printer, User, FileSpreadsheet, Moon, Sun, Maximize2, Minimize2 } from 'lucide-react';
 
 interface HeaderProps {
@@ -16,16 +17,8 @@ export const Header: React.FC<HeaderProps> = ({
   minutosDesdeAtualizacao,
 }) => {
   const { usuario, usuariosDisponiveis, loginComo } = useAuth();
-  const [isDark, setIsDark] = useState(false);
+  const { isDark, toggleTheme } = useTheme();
   const [isFullscreen, setIsFullscreen] = useState(false);
-
-  useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [isDark]);
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -38,7 +31,7 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="bg-white border-b border-slate-200 sticky top-0 z-30 no-print">
+    <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 no-print transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Brand / Logo */}
         <div className="flex items-center gap-3">
@@ -47,17 +40,17 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="font-bold text-slate-900 text-base leading-tight">GrowMetrics Digital</h1>
-              <span className="text-[10px] font-semibold tracking-wide uppercase px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
+              <h1 className="font-bold text-slate-900 dark:text-white text-base leading-tight">GrowMetrics Digital</h1>
+              <span className="text-[10px] font-semibold tracking-wide uppercase px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
                 BI Multicliente
               </span>
             </div>
-            <p className="text-xs text-slate-500">Painel Centralizado de Marketing</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Painel Centralizado de Marketing</p>
           </div>
         </div>
 
         {/* Central / Status de Frescor */}
-        <div className="hidden md:flex items-center gap-2 text-xs text-slate-500 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200">
+        <div className="hidden md:flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
           <span>
             Atualizado {minutosDesdeAtualizacao === 0 ? 'agora' : `há ${minutosDesdeAtualizacao} min`}
@@ -65,7 +58,7 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             onClick={onRefresh}
             title="Recarregar métricas"
-            className="p-1 hover:text-blue-600 transition-colors ml-1"
+            className="p-1 hover:text-blue-600 dark:hover:text-blue-400 transition-colors ml-1"
           >
             <RefreshCw className="w-3.5 h-3.5" />
           </button>
@@ -75,11 +68,11 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center gap-2 sm:gap-3">
           {/* Alternador Dark Mode */}
           <button
-            onClick={() => setIsDark(!isDark)}
+            onClick={toggleTheme}
             title={isDark ? 'Ativar Modo Claro' : 'Ativar Modo Escuro'}
             className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition"
           >
-            {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-600" />}
+            {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-600 dark:text-slate-300" />}
           </button>
 
           {/* Modo Apresentação / Tela Cheia (RNF-07) */}
@@ -88,36 +81,36 @@ export const Header: React.FC<HeaderProps> = ({
             title={isFullscreen ? 'Sair da Tela Cheia' : 'Modo Reunião / Tela Cheia (RNF-07)'}
             className="hidden md:flex p-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition"
           >
-            {isFullscreen ? <Minimize2 className="w-4 h-4 text-blue-600" /> : <Maximize2 className="w-4 h-4 text-slate-600" />}
+            {isFullscreen ? <Minimize2 className="w-4 h-4 text-blue-600 dark:text-blue-400" /> : <Maximize2 className="w-4 h-4 text-slate-600 dark:text-slate-300" />}
           </button>
 
           <button
             onClick={onExportCsv}
             title="Exportar planilha de dados em CSV (RF-17)"
-            className="hidden sm:flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition"
+            className="hidden sm:flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition"
           >
-            <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
+            <FileSpreadsheet className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             <span>Exportar CSV</span>
           </button>
 
           <button
             onClick={onExportPdf}
-            className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition"
+            className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition"
           >
-            <Printer className="w-4 h-4 text-slate-600" />
+            <Printer className="w-4 h-4 text-slate-600 dark:text-slate-300" />
             <span>Exportar PDF</span>
           </button>
 
           {/* Quick Profile Switcher for Testing RBAC & Multitenancy */}
-          <div className="relative flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5">
-            <User className="w-4 h-4 text-slate-500" />
+          <div className="relative flex items-center gap-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5">
+            <User className="w-4 h-4 text-slate-500 dark:text-slate-400" />
             <select
               value={usuario?.id || 'usr-admin'}
               onChange={(e) => loginComo(e.target.value)}
-              className="bg-transparent text-xs font-medium text-slate-800 outline-none cursor-pointer pr-1"
+              className="bg-transparent text-xs font-medium text-slate-800 dark:text-slate-200 outline-none cursor-pointer pr-1"
             >
               {usuariosDisponiveis.map((u) => (
-                <option key={u.id} value={u.id}>
+                <option key={u.id} value={u.id} className="bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100">
                   {u.nome} ({u.perfil})
                 </option>
               ))}

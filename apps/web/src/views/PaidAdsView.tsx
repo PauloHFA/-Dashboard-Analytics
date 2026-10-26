@@ -24,11 +24,11 @@ export const PaidAdsView: React.FC<Props> = ({ campanhas }) => {
       {/* 1. Previsão de Ritmo de Gasto (Budget Pacing & Run-rate) */}
       <BudgetPacingCard clienteId={clienteId} />
 
-      <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+      <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm transition-colors">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
-            <h3 className="text-base font-semibold text-slate-900">Desempenho por Campanha</h3>
-            <p className="text-xs text-slate-500">
+            <h3 className="text-base font-semibold text-slate-900 dark:text-white">Desempenho por Campanha</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               Detalhamento de campanhas ativas em Google Ads e Meta Ads no período selecionado
             </p>
           </div>
@@ -42,7 +42,7 @@ export const PaidAdsView: React.FC<Props> = ({ campanhas }) => {
                 value={busca}
                 onChange={(e) => setBusca(e.target.value)}
                 placeholder="Buscar campanha..."
-                className="pl-9 pr-3 py-1.5 text-xs border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 w-48 sm:w-64"
+                className="pl-9 pr-3 py-1.5 text-xs border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 w-48 sm:w-64"
               />
             </div>
 
@@ -50,11 +50,11 @@ export const PaidAdsView: React.FC<Props> = ({ campanhas }) => {
             <select
               value={filtroCanal}
               onChange={(e) => setFiltroCanal(e.target.value as any)}
-              className="text-xs border border-slate-300 rounded-lg px-2.5 py-1.5 bg-white text-slate-700 outline-none"
+              className="text-xs border border-slate-300 dark:border-slate-700 rounded-lg px-2.5 py-1.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 outline-none"
             >
-              <option value="todos">Todos os canais</option>
-              <option value="google_ads">Google Ads</option>
-              <option value="meta_ads">Meta Ads</option>
+              <option value="todos" className="bg-white dark:bg-slate-800">Todos os canais</option>
+              <option value="google_ads" className="bg-white dark:bg-slate-800">Google Ads</option>
+              <option value="meta_ads" className="bg-white dark:bg-slate-800">Meta Ads</option>
             </select>
           </div>
         </div>
@@ -63,7 +63,7 @@ export const PaidAdsView: React.FC<Props> = ({ campanhas }) => {
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="border-b border-slate-200 bg-slate-50 text-slate-600 font-semibold">
+              <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 text-slate-600 dark:text-slate-300 font-semibold">
                 <th className="py-3 px-3">Campanha</th>
                 <th className="py-3 px-3">Canal</th>
                 <th className="py-3 px-3 text-right">Investimento</th>
@@ -76,52 +76,52 @@ export const PaidAdsView: React.FC<Props> = ({ campanhas }) => {
                 <th className="py-3 px-3 text-right">ROAS</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {campanhasFiltradas.length === 0 ? (
                 <tr>
-                  <td colSpan={10} className="py-8 text-center text-slate-400">
+                  <td colSpan={10} className="py-8 text-center text-slate-400 dark:text-slate-500">
                     Nenhuma campanha encontrada para os filtros selecionados.
                   </td>
                 </tr>
               ) : (
                 campanhasFiltradas.map((cmp) => (
-                  <tr key={cmp.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="py-3 px-3 font-medium text-slate-900 max-w-xs truncate">
+                  <tr key={cmp.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
+                    <td className="py-3 px-3 font-medium text-slate-900 dark:text-slate-100 max-w-xs truncate">
                       {cmp.nome}
                     </td>
                     <td className="py-3 px-3">
                       <span
                         className={`inline-block px-2 py-0.5 rounded text-[10px] font-semibold ${
                           cmp.canal === 'google_ads'
-                            ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                            : 'bg-sky-50 text-sky-700 border border-sky-200'
+                            ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
+                            : 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800'
                         }`}
                       >
                         {cmp.canal === 'google_ads' ? 'Google Ads' : 'Meta Ads'}
                       </span>
                     </td>
-                    <td className="py-3 px-3 text-right font-semibold text-slate-800">
+                    <td className="py-3 px-3 text-right font-semibold text-slate-800 dark:text-slate-200">
                       {formatarMoeda(cmp.investimento)}
                     </td>
-                    <td className="py-3 px-3 text-right text-slate-600">
+                    <td className="py-3 px-3 text-right text-slate-600 dark:text-slate-400">
                       {formatarNumero(cmp.impressoes)}
                     </td>
-                    <td className="py-3 px-3 text-right text-slate-600">
+                    <td className="py-3 px-3 text-right text-slate-600 dark:text-slate-400">
                       {formatarNumero(cmp.cliques)}
                     </td>
-                    <td className="py-3 px-3 text-right font-medium text-slate-700">
+                    <td className="py-3 px-3 text-right font-medium text-slate-700 dark:text-slate-300">
                       {formatarPercentual(cmp.ctr)}
                     </td>
-                    <td className="py-3 px-3 text-right text-slate-600">
+                    <td className="py-3 px-3 text-right text-slate-600 dark:text-slate-400">
                       {formatarMoeda(cmp.cpc)}
                     </td>
-                    <td className="py-3 px-3 text-right font-semibold text-emerald-600">
+                    <td className="py-3 px-3 text-right font-semibold text-emerald-600 dark:text-emerald-400">
                       {formatarNumero(cmp.conversoes)}
                     </td>
-                    <td className="py-3 px-3 text-right font-medium text-slate-700">
+                    <td className="py-3 px-3 text-right font-medium text-slate-700 dark:text-slate-300">
                       {formatarMoeda(cmp.cpa)}
                     </td>
-                    <td className="py-3 px-3 text-right font-bold text-slate-900">
+                    <td className="py-3 px-3 text-right font-bold text-slate-900 dark:text-white">
                       {cmp.roas > 0 ? `${cmp.roas.toFixed(2)}x` : '-'}
                     </td>
                   </tr>

@@ -162,7 +162,7 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors">
       <Header
         minutosDesdeAtualizacao={minutosDesdeAtualizacao}
         onRefresh={() => {
@@ -176,7 +176,7 @@ export const App: React.FC = () => {
       <FilterBar />
 
       {/* Navegação Secundária por Abas */}
-      <div className="bg-white border-b border-slate-200 no-print">
+      <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 no-print transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex space-x-6 overflow-x-auto py-2">
             {abas.map((aba) => (
@@ -185,14 +185,14 @@ export const App: React.FC = () => {
                 onClick={() => setAbaAtiva(aba.id as AbaAtiva)}
                 className={`flex items-center gap-1.5 py-2 px-1 border-b-2 text-xs font-semibold whitespace-nowrap transition ${
                   abaAtiva === aba.id
-                    ? 'border-blue-600 text-blue-600'
-                    : 'border-transparent text-slate-500 hover:text-slate-800'
+                    ? 'border-blue-600 text-blue-600 dark:text-blue-400'
+                    : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                 }`}
               >
                 {aba.icone}
                 <span>{aba.label}</span>
                 {'badge' in aba && aba.badge !== undefined && (
-                  <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-rose-100 text-rose-700 border border-rose-200">
+                  <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
                     {aba.badge}
                   </span>
                 )}
@@ -205,7 +205,7 @@ export const App: React.FC = () => {
       {/* Conteúdo Principal */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {carregandoResumo && !dadosResumo ? (
-          <div className="py-20 flex flex-col items-center justify-center text-slate-400">
+          <div className="py-20 flex flex-col items-center justify-center text-slate-400 dark:text-slate-500">
             <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-3"></div>
             <p className="text-xs font-medium">Consolidando métricas multicliente...</p>
           </div>

@@ -132,17 +132,17 @@ export const OverviewView: React.FC<Props> = ({
 
       {/* Linha dos Gráficos: Tendência Interativa + Distribuição por Canal */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm transition-colors">
           <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
             <div>
-              <h3 className="text-base font-semibold text-slate-900">Evolução Temporal no Período</h3>
-              <p className="text-xs text-slate-500">
+              <h3 className="text-base font-semibold text-slate-900 dark:text-white">Evolução Temporal no Período</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Linha contínua: período atual | Linha tracejada: comparativo
               </p>
             </div>
 
             {/* Alternador de Métrica do Gráfico */}
-            <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg">
+            <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
               {(
                 [
                   { id: 'investimento', label: 'Investimento' },
@@ -156,8 +156,8 @@ export const OverviewView: React.FC<Props> = ({
                   onClick={() => setMetricaGrafico(tab.id)}
                   className={`text-xs px-2.5 py-1 rounded font-medium transition ${
                     metricaGrafico === tab.id
-                      ? 'bg-white text-blue-700 shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900'
+                      ? 'bg-white dark:bg-slate-700 text-blue-700 dark:text-blue-300 shadow-xs'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
                   }`}
                 >
                   {tab.label}
@@ -174,20 +174,20 @@ export const OverviewView: React.FC<Props> = ({
         </div>
 
         {/* Divisão de Investimento por Canal */}
-        <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm flex flex-col justify-between">
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm flex flex-col justify-between transition-colors">
           <div>
-            <h3 className="text-base font-semibold text-slate-900 mb-1">Distribuição de Mídia</h3>
-            <p className="text-xs text-slate-500 mb-4">Participação no investimento total</p>
+            <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-1">Distribuição de Mídia</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">Participação no investimento total</p>
             <ChannelDonutChart canais={canais} />
           </div>
 
-          <div className="mt-4 pt-4 border-t border-slate-100 space-y-2 text-xs">
+          <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 space-y-2 text-xs">
             {canais
               .filter((c) => c.investimento > 0)
               .map((c) => (
-                <div key={c.canal} className="flex justify-between items-center text-slate-600">
+                <div key={c.canal} className="flex justify-between items-center text-slate-600 dark:text-slate-400">
                   <span className="font-medium">{c.nomeExibicao}</span>
-                  <span className="font-semibold text-slate-900">
+                  <span className="font-semibold text-slate-900 dark:text-white">
                     {formatarMoeda(c.investimento)} ({c.participacaoInvestimento}%)
                   </span>
                 </div>

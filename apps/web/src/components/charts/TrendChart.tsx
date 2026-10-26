@@ -3,6 +3,7 @@ import { Line } from 'react-chartjs-2';
 import './chartSetup';
 import { temaCores } from './chartSetup';
 import { PontoSerieTemporal } from '@dashboard/shared';
+import { useTheme } from '../../context/ThemeContext';
 
 interface Props {
   atual: PontoSerieTemporal[];
@@ -19,6 +20,7 @@ const configMetricas = {
 };
 
 export const TrendChart: React.FC<Props> = ({ atual, comparativo, metrica, titulo }) => {
+  const { isDark } = useTheme();
   const cfg = configMetricas[metrica];
 
   const datasets: any[] = [
@@ -26,7 +28,7 @@ export const TrendChart: React.FC<Props> = ({ atual, comparativo, metrica, titul
       label: 'Período Atual',
       data: atual.map((p) => p[metrica]),
       borderColor: temaCores.primaria,
-      backgroundColor: temaCores.primariaSuave,
+      backgroundColor: isDark ? 'rgba(37, 99, 235, 0.2)' : temaCores.primariaSuave,
       fill: true,
       tension: 0.28,
       pointRadius: atual.length > 40 ? 0 : 3,
@@ -39,7 +41,7 @@ export const TrendChart: React.FC<Props> = ({ atual, comparativo, metrica, titul
     datasets.push({
       label: 'Período Comparado',
       data: comparativo.map((p) => p[metrica]),
-      borderColor: temaCores.neutra,
+      borderColor: isDark ? '#64748b' : temaCores.neutra,
       borderDash: [6, 4], // Especificação formal da seção 11.3
       fill: false,
       tension: 0.28,
@@ -68,6 +70,7 @@ export const TrendChart: React.FC<Props> = ({ atual, comparativo, metrica, titul
           usePointStyle: true,
           boxWidth: 8,
           font: { family: 'Inter, sans-serif', size: 12 },
+          color: isDark ? '#cbd5e1' : '#334155',
         },
       },
       tooltip: {
@@ -91,12 +94,13 @@ export const TrendChart: React.FC<Props> = ({ atual, comparativo, metrica, titul
     scales: {
       x: {
         grid: { display: false },
-        ticks: { font: { size: 11 }, maxTicksLimit: 12 },
+        ticks: { font: { size: 11 }, maxTicksLimit: 12, color: isDark ? '#94a3b8' : '#64748b' },
       },
       y: {
-        grid: { color: '#f1f5f9' },
+        grid: { color: isDark ? '#1e293b' : '#f1f5f9' },
         ticks: {
           font: { size: 11 },
+          color: isDark ? '#94a3b8' : '#64748b',
           callback: (value: any) => (cfg.prefixo ? `${cfg.prefixo}${value}` : value),
         },
       },
@@ -105,9 +109,8 @@ export const TrendChart: React.FC<Props> = ({ atual, comparativo, metrica, titul
 
   return (
     <div className="w-full h-72">
-      {titulo && <h4 className="text-sm font-semibold text-slate-700 mb-2">{titulo}</h4>}
+      {titulo && <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">{titulo}</h4>}
       <Line data={data} options={options} />
     </div>
   );
 };
-

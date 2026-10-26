@@ -32,76 +32,76 @@ export const BrandSettingsView: React.FC = () => {
   if (!marca) return null;
 
   return (
-    <div className="max-w-2xl bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+    <div className="max-w-2xl bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm transition-colors">
       <div className="flex items-center gap-2 mb-4">
-        <Palette className="w-5 h-5 text-blue-600" />
-        <h3 className="text-base font-semibold text-slate-900">Personalização da Marca da Agência</h3>
+        <Palette className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+        <h3 className="text-base font-semibold text-slate-900 dark:text-white">Personalização da Marca da Agência</h3>
       </div>
-      <p className="text-xs text-slate-500 mb-6">
+      <p className="text-xs text-slate-500 dark:text-slate-400 mb-6">
         Configure a identidade visual que será aplicada no painel e nos relatórios exportados em PDF (RF-14).
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-xs font-semibold text-slate-700 mb-1">Nome da Agência</label>
+          <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Nome da Agência</label>
           <input
             type="text"
             value={marca.nome}
             onChange={(e) => setMarca({ ...marca, nome: e.target.value })}
-            className="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full text-xs border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Cor Primária</label>
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Cor Primária</label>
             <div className="flex items-center gap-2">
               <input
                 type="color"
                 value={marca.corPrimaria}
                 onChange={(e) => setMarca({ ...marca, corPrimaria: e.target.value })}
-                className="w-9 h-9 p-0.5 border border-slate-300 rounded cursor-pointer"
+                className="w-9 h-9 p-0.5 border border-slate-300 dark:border-slate-700 rounded cursor-pointer bg-white dark:bg-slate-800"
               />
-              <span className="font-mono text-xs text-slate-700">{marca.corPrimaria}</span>
+              <span className="font-mono text-xs text-slate-700 dark:text-slate-300">{marca.corPrimaria}</span>
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Cor Secundária</label>
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Cor Secundária</label>
             <div className="flex items-center gap-2">
               <input
                 type="color"
                 value={marca.corSecundaria}
                 onChange={(e) => setMarca({ ...marca, corSecundaria: e.target.value })}
-                className="w-9 h-9 p-0.5 border border-slate-300 rounded cursor-pointer"
+                className="w-9 h-9 p-0.5 border border-slate-300 dark:border-slate-700 rounded cursor-pointer bg-white dark:bg-slate-800"
               />
-              <span className="font-mono text-xs text-slate-700">{marca.corSecundaria}</span>
+              <span className="font-mono text-xs text-slate-700 dark:text-slate-300">{marca.corSecundaria}</span>
             </div>
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-700 mb-1">Texto do Rodapé no PDF</label>
+          <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Texto do Rodapé no PDF</label>
           <textarea
             rows={2}
             value={marca.rodapeTexto}
             onChange={(e) => setMarca({ ...marca, rodapeTexto: e.target.value })}
-            className="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full text-xs border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
         </div>
 
         {sucesso && (
-          <div className="flex items-center gap-1.5 text-xs text-emerald-700 bg-emerald-50 p-2.5 rounded-lg border border-emerald-200">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+          <div className="flex items-center gap-1.5 text-xs text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 p-2.5 rounded-lg border border-emerald-200 dark:border-emerald-800">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             <span>Identidade visual atualizada com sucesso!</span>
           </div>
         )}
 
         <button
           type="submit"
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold shadow transition"
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold shadow transition cursor-pointer"
         >
           Salvar Alterações
         </button>
@@ -109,4 +109,3 @@ export const BrandSettingsView: React.FC = () => {
     </div>
   );
 };
-
