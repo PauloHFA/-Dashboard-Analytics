@@ -81,10 +81,35 @@ As plataformas de anúncios consolidam conversões por modelo de atribuição ao
 
 ---
 
-## 4. Pipeline de CI/CD e Garantia de Qualidade
+## 4. Operação e Manutenção dos Módulos Adicionais (Fora do Escopo Base)
+
+### 4.1 Ingestão Contínua via Webhook de CRM (`POST /api/v1/webhooks/crm/:clienteId`)
+* **Finalidade**: Elimina a necessidade de preenchimento manual diário de vendas, atualizando CAC e ROI em tempo real.
+* **Segurança e Idempotência**:
+  * O endpoint aceita payloads de CRMs como RD Station, HubSpot, ActiveCampaign e PipeRun.
+  * Valida o `clienteId` e agrega receita e contagem de clientes faturados aos fatos do dia corrente.
+  * Em caso de reenvio de payload idêntico pelo provedor de CRM, garanta o controle por idempotência no `payload.id` caso seja ativado o modo estrito em produção.
+
+### 4.2 Motor do AI Growth Copilot
+* **Lógica Heurística**: Avalia ROAS ponderado, oscilações no CPA em relação ao período anterior e alertas de erro nas conexões para gerar uma pontuação de 0 a 100 (*Score de Saúde*).
+* **Configuração de LLM Externa (Opcional)**:
+  * O serviço (`apps/api/src/services/aiCopilotService.ts`) foi estruturado com camada desacoplada.
+  * Para plugar o Gemini 1.5 Pro ou GPT-4o, basta definir as variáveis de ambiente `AI_PROVIDER=gemini` e `GEMINI_API_KEY=...`. Caso desativado, o motor heurístico nativo responde em tempo real sem custo de API e com 100% de disponibilidade.
+
+### 4.3 Gestão de Ritmo de Gasto (*Budget Pacing*)
+* O motor calcula diariamente a verba restante dividida pelos dias úteis ou corridos remanescentes do mês civil.
+* Se a projeção (*run-rate*) ultrapassar 110% do teto contratado pelo cliente, o card exibe badge de alerta âmbar/vermelho indicando a necessidade de desaceleração imediata.
+
+### 4.4 Automação de Agendamentos e Webhook de WhatsApp (RF-15)
+* Disparos agendados rodam como rotinas periódicas (CRON).
+* Para envio via WhatsApp, integra-se via webhook REST direto (ex: Evolution API, Z-API ou Baileys) enviando a mensagem com o resumo dos KPIs e o link seguro para download do PDF.
+
+---
+
+## 5. Pipeline de CI/CD e Garantia de Qualidade
 
 Todo commit ou Pull Request passa automaticamente pelo pipeline do GitHub Actions (`.github/workflows/ci.yml`), validando:
 1. Compilação TypeScript de todos os pacotes (`npm run build`).
-2. Execução dos **24 testes unitários e de integração** (`npm test`).
+2. Execução dos **32 testes automatizados unitários e de integração** (`npm test`).
 3. Auditoria automatizada dos **Critérios de Aceite da Seção 14** (`npm run check:acceptance`).
 

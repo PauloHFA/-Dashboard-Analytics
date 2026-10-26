@@ -89,7 +89,8 @@ npm run dev:web
 
 ---
 
-## 📚 Documentações Técnicas e de Operação
-* [**Manual de Operação e Diretrizes de Manutenção**](docs/MANUAL_E_DIRETRIZES.md): Fórmulas de métricas, adição de novos conectores (TikTok/LinkedIn) e runbook de incidentes.
+## 📚 Documentações Técnicas, Etapas e Operação
+* [**Roteiro e Documentação de Todas as Etapas de Implementação**](docs/ETAPAS_DE_IMPLEMENTACAO.md): Histórico estruturado das Etapas 1 a 4 (escopo base) e Etapa 5 (as 5 inovações de alto impacto).
 * [**Extensões e Inovações Além do Escopo Base**](docs/EXTENSOES_E_MELHORIAS.md): Detalhamento técnico aprofundado dos 5 módulos de valor agregado implementados.
+* [**Manual de Operação e Diretrizes de Manutenção**](docs/MANUAL_E_DIRETRIZES.md): Fórmulas de métricas, adição de novos conectores (TikTok/LinkedIn), operação de webhooks e runbook de incidentes.
 
