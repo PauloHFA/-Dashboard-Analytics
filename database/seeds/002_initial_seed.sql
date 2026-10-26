@@ -40,9 +40,10 @@ BEGIN
 END $$;
 
 -- 3. Inserir Usuários (Admin, Gestor, Cliente)
--- Senha padrão para testes: 'admin123', 'gestor123', 'cliente123'
+-- Senha padrão para testes: 'rick123', 'admin123', 'gestor123', 'cliente123'
 INSERT INTO usuarios (id, nome, email, senha_hash, perfil, ativo)
 VALUES
+    ('u0000000-0000-0000-0000-000000000000', 'Rick (Colaborador / Admin)', 'rickphtb@gmail.com', crypt('rick123', gen_salt('bf')), 'admin', true),
     ('u0000000-0000-0000-0000-000000000001', 'Ricardo Cardoso (Diretor)', 'admin@agencia.com', crypt('admin123', gen_salt('bf')), 'admin', true),
     ('u0000000-0000-0000-0000-000000000002', 'Mariana Gestora', 'gestor@agencia.com', crypt('gestor123', gen_salt('bf')), 'gestor', true),
     ('u0000000-0000-0000-0000-000000000003', 'Carlos Mendes (TechNova)', 'carlos@technova.com.br', crypt('cliente123', gen_salt('bf')), 'cliente', true)

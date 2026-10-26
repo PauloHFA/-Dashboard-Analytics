@@ -90,6 +90,15 @@ export function inicializarStore(): DataStore {
   // Usuários com perfis definidos (Admin, Gestor, Cliente)
   const usuarios: Usuario[] = [
     {
+      id: 'usr-rick',
+      nome: 'Rick (Colaborador / Admin)',
+      email: 'rickphtb@gmail.com',
+      perfil: 'admin',
+      ativo: true,
+      clientesIds: clientes.map((c) => c.id),
+      criadoEm: '2025-01-01T00:00:00Z',
+    },
+    {
       id: 'usr-admin',
       nome: 'Ricardo Cardoso (Diretor)',
       email: 'admin@agencia.com',

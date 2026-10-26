@@ -16,7 +16,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [carregando, setCarregando] = useState(true);
 
   const usuariosDisponiveis = [
-    { id: 'usr-admin', nome: 'Ricardo Cardoso', perfil: 'Admin (Agência)', email: 'admin@agencia.com' },
+    { id: 'usr-rick', nome: 'Rick (Colaborador)', perfil: 'Admin (Agência)', email: 'rickphtb@gmail.com' },
+    { id: 'usr-admin', nome: 'Ricardo Cardoso', perfil: 'Diretor (Agência)', email: 'admin@agencia.com' },
     { id: 'usr-gestor', nome: 'Mariana Gestora', perfil: 'Gestor (3 Clientes)', email: 'gestor@agencia.com' },
     { id: 'usr-cliente-01', nome: 'Carlos Mendes', perfil: 'Cliente (TechNova)', email: 'carlos@technova.com.br' },
   ];
@@ -35,7 +36,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
-    const savedToken = localStorage.getItem('auth_token') || 'usr-admin';
+    const savedToken = localStorage.getItem('auth_token') || 'usr-rick';
     carregarUsuario(savedToken);
   }, []);
 
